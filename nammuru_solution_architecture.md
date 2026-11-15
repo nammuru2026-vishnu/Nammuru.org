@@ -27,6 +27,24 @@ The platform brings together complementary service areas that support civic part
 
 These are capability descriptions, not internal component names, deployment units, or a map of system boundaries. Capabilities may be combined or delivered differently as the platform evolves.
 
+## Application technology stack
+
+The documented application and platform stack includes the following technologies and patterns. This is a high-level inventory, not a component-to-endpoint map.
+
+| Area | Technology or pattern | Public-facing role |
+| --- | --- | --- |
+| User experience | Web application and Progressive Web App (PWA) | Provides browser-based access for supported audiences. |
+| Application layer | Domain APIs and background workers | Supports civic workflows and asynchronous tasks. The source architecture does not specify a programming language or application framework. |
+| Relational data | PostgreSQL | Stores structured application information. |
+| Connection management | PgBouncer | Supports efficient management of database connections. |
+| Caching | Redis | Supports low-latency, transient application data. |
+| Asynchronous messaging | RabbitMQ | Supports decoupled communication and background processing. |
+| Search and analytics | OpenSearch, where enabled | Supports search or exploration capabilities when included in an environment. |
+| File and media storage | Cloud object storage | Supports uploaded files and media; provider and account details are intentionally omitted. |
+| Media intelligence | Machine-learning processing | Can assist with submitted media where appropriate; does not replace human review. |
+
+Technology choices and optional components may vary by environment. No specific application language, framework, endpoint, data schema, or production configuration is asserted here unless documented.
+
 ## System design
 
 At a public level, NammUru can be understood as a set of user experiences, civic capabilities, and shared supporting capabilities. User experiences bring together the relevant civic capabilities for each journey. Common support functions provide appropriate information handling, communications, and reporting. Not every capability participates in every interaction.
@@ -146,6 +164,22 @@ flowchart TB
     FILES[Managed file and media handling] --- SERVICES
     DELIVERY[Controlled software delivery] --> APP
 ```
+
+## Deployment technology stack
+
+The deployment toolchain separates application packaging and delivery from provisioning the underlying cloud foundation. Exact provider, region, environment names, and deployment configuration are deliberately not published here.
+
+| Layer | Technology or pattern | Role |
+| --- | --- | --- |
+| Container runtime | Kubernetes | Runs and manages containerized application workloads. |
+| Workload packaging | Helm | Packages workload definitions and environment-specific configuration. |
+| Continuous delivery | Argo CD and GitOps | Reconciles approved, version-controlled configuration with the managed runtime. |
+| Build and test automation | GitHub Actions | Runs automated build and test workflows and supports release preparation. |
+| Container image registry | GitHub Container Registry (GHCR) | Stores versioned application images. |
+| Infrastructure as code | Terraform for the documented cloud provisioning path; AWS CDK also exists in the source architecture | Describes cloud foundation provisioning, separate from application workload releases. Actual adoption and ownership should be verified internally. |
+| Shared runtime services | PostgreSQL, PgBouncer, Redis, RabbitMQ, optional OpenSearch, and object storage | Provides data persistence, connection pooling, caching, messaging, search when enabled, and file storage. |
+
+The listed technologies describe the documented stack; they do not imply that every optional component is active in every environment. The detailed configuration and resource ownership remain internal.
 
 ### Deployment process design
 
