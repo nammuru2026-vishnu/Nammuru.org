@@ -6,22 +6,26 @@ NammUru is a digital platform for civic engagement and local governance. It help
 
 This public overview describes the platform in business and conceptual terms. It intentionally omits internal product-service names, environment and hosting identifiers, detailed system topology, operational procedures, and security-sensitive implementation information.
 
-## Product capabilities
+## Product capabilities and service areas
 
-The platform brings together capabilities that support civic participation and service delivery:
+The platform brings together complementary service areas that support civic participation and public-service delivery:
 
-- **People and access experience:** Provides a consistent experience for community members, public-service teams, and partners, with access appropriate to each audience.
-- **Place-based information:** Relates civic information to neighborhoods and administrative areas so that people can understand local context.
-- **Community assets:** Organizes information about civic infrastructure and shared community resources.
-- **Issue and service engagement:** Supports reporting concerns, coordinating follow-up, and communicating progress or outcomes.
-- **Planning and participation:** Helps connect civic priorities with funding opportunities and community or partner participation.
-- **Media and communication support:** Supports relevant submitted content and timely updates through available channels.
-- **Public engagement:** Enables community input and proposals, including petition-style participation.
-- **Insights and reporting:** Helps teams and communities understand service activity, local conditions, and trends.
-- **Neighborhood indicators:** Presents high-level information about civic service experience and neighborhood liveability.
-- **Information discovery:** Makes civic information easier to explore and access through supported digital interactions.
+| Service area | Public-facing responsibility |
+| --- | --- |
+| People and access | Provides a consistent experience for community members, public-service teams, and partners, with access appropriate to each audience. |
+| Place-based information | Relates civic information to neighborhoods and administrative areas to provide local context. |
+| Community assets | Organizes information about civic infrastructure and shared community resources. |
+| Issues and service requests | Supports reporting concerns, coordinating follow-up, and communicating progress or outcomes. |
+| Planning and funding | Connects civic priorities with funding opportunities and community or partner participation. |
+| Media understanding | Supports review of relevant submitted media where appropriate; automated assistance does not replace human or policy review. |
+| Notifications and communications | Provides relevant updates through available communication channels. |
+| Public engagement | Enables community input and proposals, including petition-style participation. |
+| Reporting and insights | Helps teams and communities understand service activity, local conditions, and trends. |
+| Neighborhood indicators | Presents high-level information about civic service experience and neighborhood liveability. |
+| Information discovery | Makes civic information easier to explore and access through supported digital interactions. |
+| Web and channel experience | Offers user-facing digital experiences across supported channels. |
 
-These are capability descriptions, not internal component names or a map of system boundaries.
+These are capability descriptions, not internal component names, deployment units, or a map of system boundaries. Capabilities may be combined or delivered differently as the platform evolves.
 
 ## Conceptual platform view
 
@@ -79,39 +83,59 @@ flowchart LR
     INSIGHTS --> INDICATORS[Indicators and trends]
 ```
 
+## Service collaboration design
+
+The service areas collaborate to support end-to-end civic journeys. For example, a user-facing experience can combine access and place context with issue handling, optional media assistance, communications, and reporting. Partner participation can combine opportunity information, coordination, progress tracking, and outcome reporting. Insights can draw on suitable, governed civic information and local context.
+
+Not every capability is involved in every interaction. Information should be shared only as needed for the relevant purpose, with appropriate privacy, access, retention, and governance controls. Public materials describe these collaborations at a conceptual level and do not expose internal interfaces, detailed data flows, or access-control rules.
+
 ## Conceptual deployment architecture
 
-The platform is designed as a set of digital capabilities delivered through a managed application environment. Public traffic reaches the application through a protected entry layer. Application capabilities use shared platform resources as needed. The diagram is deliberately generic and does not identify vendors, regions, instances, namespaces, internal routes, or specific software products.
+The platform is designed as a set of digital capabilities delivered through a managed application environment. Public traffic reaches the application through a protected entry layer. Application capabilities use shared platform resources as needed, and background processing can handle work that does not need to complete within a user's immediate interaction. Persistent information and uploaded files are handled by managed storage capabilities.
+
+The diagram is deliberately generic and does not identify vendors, regions, instances, namespaces, internal routes, or specific software products.
 
 ```mermaid
 flowchart TB
     USERS[Community members, teams, and partners] --> CHANNELS[Public digital channels]
-    CHANNELS --> EDGE[Protected application entry]
+    CHANNELS --> ENTRY[Protected application entry]
 
     subgraph APP[Managed application environment]
-        EDGE --> CAPABILITIES[Application capabilities]
-        CAPABILITIES --> ASYNC[Background and scheduled processing]
-        CAPABILITIES --> SHARED[Shared data and communication resources]
+        ENTRY --> SERVICES[User-facing civic capabilities]
+        SERVICES --> WORK[Background and scheduled processing]
+        SERVICES --> SHARED[Shared data and communication capabilities]
     end
 
-    FILES[Managed file and media storage] --- CAPABILITIES
+    FILES[Managed file and media handling] --- SERVICES
     DELIVERY[Controlled software delivery] --> APP
 ```
 
-### Delivery approach
+### Deployment process design
 
-Changes are checked and packaged through an automated delivery process. Versioned release configuration is used to promote application updates into the managed runtime. Cloud foundation provisioning and application release are separate responsibilities. Environment-specific settings and optional capabilities can vary, and should be governed through the appropriate internal processes.
+A release follows a controlled, repeatable lifecycle. A change is reviewed and checked; a versioned application package is produced; release configuration identifies the intended version; and an automated deployment process applies the approved configuration to the managed environment. Health and availability checks provide feedback after rollout. If an issue is detected, the release process should support a controlled recovery to a previously approved version.
 
 ```mermaid
 flowchart LR
-    CHANGE[Software change] --> CHECKS[Build and quality checks]
-    CHECKS --> PACKAGE[Versioned application package]
-    PACKAGE --> RELEASE[Reviewed release configuration]
-    RELEASE --> RECONCILE[Automated environment update]
-    RECONCILE --> RUNNING[Available platform capabilities]
+    CHANGE[Proposed change] --> REVIEW[Review and automated quality checks]
+    REVIEW --> PACKAGE[Build versioned application package]
+    PACKAGE --> CONFIG[Prepare versioned release configuration]
+    CONFIG --> APPROVAL[Release approval or policy checks]
+    APPROVAL --> DEPLOY[Automated rollout]
+    DEPLOY --> VERIFY[Health and availability verification]
+    VERIFY --> READY[Release available to users]
+    VERIFY --> RECOVER[Controlled recovery if needed]
 ```
 
-This diagram communicates the release concept only; it is not an operational runbook or a description of a specific production environment.
+### Deployment principles
+
+- **Traceable releases:** Application packages and release configuration should be versioned so changes can be associated with an approved source revision.
+- **Separation of responsibilities:** Building and testing software, managing release configuration, deploying application workloads, and provisioning the underlying cloud foundation are distinct activities.
+- **Configuration as code:** Environment-specific settings should be managed through controlled configuration rather than copied or manually edited during release.
+- **Gradual and verifiable rollout:** Releases should be checked for expected health and availability, with recovery procedures maintained for operational use.
+- **Least exposure:** Public access should be limited to intended user-facing capabilities. Internal operational interfaces and sensitive configuration are not part of this public architecture description.
+- **Environment flexibility:** Capabilities and supporting resources may differ by environment; the approved internal deployment configuration is authoritative.
+
+This section summarizes design principles only. It is not a runbook and does not disclose deployment commands, private endpoints, infrastructure identifiers, privileged workflows, or environment-specific settings.
 
 ## Security, privacy, and scope
 
