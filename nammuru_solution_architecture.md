@@ -27,20 +27,56 @@ The platform brings together complementary service areas that support civic part
 
 These are capability descriptions, not internal component names, deployment units, or a map of system boundaries. Capabilities may be combined or delivered differently as the platform evolves.
 
-## Conceptual platform view
+## System design
+
+At a public level, NammUru can be understood as a set of user experiences, civic capabilities, and shared supporting capabilities. User experiences bring together the relevant civic capabilities for each journey. Common support functions provide appropriate information handling, communications, and reporting. Not every capability participates in every interaction.
 
 ```mermaid
-flowchart LR
-    COMMUNITY[Residents and community members] --> EXPERIENCE[Digital civic experience]
-    TEAMS[Public-service teams] --> EXPERIENCE
-    PARTNERS[Community and funding partners] --> EXPERIENCE
-    EXPERIENCE --> CAPABILITIES[Civic information and service capabilities]
-    CAPABILITIES --> PARTICIPATION[Participation and service engagement]
-    CAPABILITIES --> INSIGHTS[Local information and insights]
-    CAPABILITIES --> UPDATES[Progress and outcome updates]
+flowchart TB
+    subgraph AUDIENCES[People who use the platform]
+        RESIDENTS[Residents and community members]
+        TEAMS[Public-service teams]
+        PARTNERS[Community and funding partners]
+    end
+
+    CHANNELS[Web and supported digital channels]
+
+    subgraph CIVIC[Connected civic capabilities]
+        ACCESS[People and access experience]
+        PLACE[Place-based information]
+        ASSETS[Community assets]
+        ISSUES[Issues and service requests]
+        PARTICIPATION[Public and partner participation]
+        MEDIA[Media and communication support]
+        INSIGHTS[Reporting and neighborhood insights]
+        DISCOVERY[Information discovery]
+    end
+
+    SHARED[Shared information and platform capabilities]
+    OUTCOMES[Relevant services, updates, and civic insights]
+
+    RESIDENTS --> CHANNELS
+    TEAMS --> CHANNELS
+    PARTNERS --> CHANNELS
+    CHANNELS --> ACCESS
+    CHANNELS --> ISSUES
+    CHANNELS --> PARTICIPATION
+    ACCESS --> PLACE
+    ISSUES --> PLACE
+    ISSUES --> MEDIA
+    ISSUES --> SHARED
+    ASSETS --> PLACE
+    PARTICIPATION --> SHARED
+    PLACE --> INSIGHTS
+    ISSUES --> INSIGHTS
+    SHARED --> INSIGHTS
+    DISCOVERY --> PLACE
+    INSIGHTS --> OUTCOMES
+    ISSUES --> OUTCOMES
+    PARTICIPATION --> OUTCOMES
 ```
 
-This is a product-level view only. It does not show internal service names, network paths, or data-store connections.
+This conceptual system design describes product relationships only. It does not expose internal component names, interfaces, network paths, data stores, or security configuration.
 
 ## Example civic flows
 
@@ -89,7 +125,7 @@ The service areas collaborate to support end-to-end civic journeys. For example,
 
 Not every capability is involved in every interaction. Information should be shared only as needed for the relevant purpose, with appropriate privacy, access, retention, and governance controls. Public materials describe these collaborations at a conceptual level and do not expose internal interfaces, detailed data flows, or access-control rules.
 
-## Conceptual deployment architecture
+## Deployment architecture
 
 The platform is designed as a set of digital capabilities delivered through a managed application environment. Public traffic reaches the application through a protected entry layer. Application capabilities use shared platform resources as needed, and background processing can handle work that does not need to complete within a user's immediate interaction. Persistent information and uploaded files are handled by managed storage capabilities.
 
@@ -101,7 +137,8 @@ flowchart TB
     CHANNELS --> ENTRY[Protected application entry]
 
     subgraph APP[Managed application environment]
-        ENTRY --> SERVICES[User-facing civic capabilities]
+        ENTRY --> EXPERIENCE[User-facing experiences]
+        EXPERIENCE --> SERVICES[Civic capabilities]
         SERVICES --> WORK[Background and scheduled processing]
         SERVICES --> SHARED[Shared data and communication capabilities]
     end
@@ -112,15 +149,15 @@ flowchart TB
 
 ### Deployment process design
 
-A release follows a controlled, repeatable lifecycle. A change is reviewed and checked; a versioned application package is produced; release configuration identifies the intended version; and an automated deployment process applies the approved configuration to the managed environment. Health and availability checks provide feedback after rollout. If an issue is detected, the release process should support a controlled recovery to a previously approved version.
+A release follows a controlled, repeatable lifecycle. A change is reviewed and checked; a versioned application package is produced; release configuration identifies the intended version; and an automated deployment process applies the approved configuration to the managed environment. Health and availability checks provide feedback after rollout. If an issue is detected, the release process should support controlled recovery to a previously approved version.
 
 ```mermaid
 flowchart LR
     CHANGE[Proposed change] --> REVIEW[Review and automated quality checks]
     REVIEW --> PACKAGE[Build versioned application package]
     PACKAGE --> CONFIG[Prepare versioned release configuration]
-    CONFIG --> APPROVAL[Release approval or policy checks]
-    APPROVAL --> DEPLOY[Automated rollout]
+    CONFIG --> POLICY[Approval and policy checks]
+    POLICY --> DEPLOY[Automated rollout]
     DEPLOY --> VERIFY[Health and availability verification]
     VERIFY --> READY[Release available to users]
     VERIFY --> RECOVER[Controlled recovery if needed]
